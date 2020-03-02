@@ -84,8 +84,6 @@ def create_timeline(wait_cost, transition_cost, start, goal):
         intervals = timeline[loc]
         minHeap = PriorityQueue()
         minHeap.buildHeap(loc_intervals[loc])
-        if loc == (1, 1):
-            a = minHeap
         while not minHeap.isEmpty():
             minNode = minHeap.delMin()
             # if the current min is equal to the previous one, ignore it.(duplicate element in the heap)
@@ -93,26 +91,23 @@ def create_timeline(wait_cost, transition_cost, start, goal):
                 continue
             else:
                 intvl = minNode.interval
-            if intvl[0] < intervals[-1][0]:
-                if intvl[1] < intervals[-1][0]:  # [[0,2],[3,5],[6,Inf]] + [4,4]/[5,5]
-                    tmp_intvl = intervals.pop()
-                    tmp_num = intervals[-1][1]
+            if intvl[0] < intervals[-1][0]:  # [[0,2],[3,5],[6,Inf]] + [4,4]/[5,5]
+                tmp_num = intervals[-1][1]
+                tmp_intvl = intervals.pop()
+                if intvl[1] < intervals[-1][0]:
                     intervals[-1][1] = intvl[0] - 1
-                    if intervals[-1][1] < intervals[-1][0]: intervals.pop()
                     intervals.append(intvl)
-                    if intvl[1] < tmp_num:  # +[4,4]
-                        intervals.append([intvl[1] + 1, tmp_num])
+                    intervals.append([intvl[1] + 1, tmp_num])
+                    if intervals[-1][1] < intervals[-1][0]: intervals.pop()
                     intervals.append(tmp_intvl)
-                else:  # [[0,2],[3,3],[4,Inf]] + [3,4]/[3,5]
-                    tmp_intvl = intervals.pop()
+                else:  # [[0,2],[3,3],[4,Inf]] + [3,3]/[3,4]/[3,5]
                     intervals.append([tmp_intvl[0], intvl[1]])
+                    if intervals[-1][1] < intervals[-1][0]: intervals.pop()
                     intervals.append([intvl[1] + 1, Inf])
             else:
-                if intervals[-1][0] == intvl[0]:
-                    intervals[-1][1] = intvl[1]
-                else:
-                    intervals[-1][1] = intvl[0] - 1
-                    intervals.append(intvl)
+                intervals[-1][1] = intvl[0] - 1
+                if intervals[-1][1] < intervals[-1][0]: intervals.pop()
+                intervals.append(intvl)
                 intervals.append([intvl[1] + 1, Inf])
 
     # check timeline is correct
@@ -163,7 +158,7 @@ class HandlerEllipse(HandlerPatch):
         return [p]
 
 
-def drawPath(path, map_, wait_cost, transition_cost, vertex_wait_cost):
+def draw_path(path, map_, wait_cost, transition_cost, vertex_wait_cost):
     mkdir('path')
     max_len = 0
     for i in map_:

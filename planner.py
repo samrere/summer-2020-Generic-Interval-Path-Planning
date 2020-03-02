@@ -13,11 +13,11 @@ class Planner:
         self.transition_cost = transition_cost
         self.original_wait_cost = wait_cost
         self.timeline, self.wait_cost = create_timeline(wait_cost, transition_cost, start, goal)
-        self.goalNumOfIntervals = len(self.timeline[goal]) if goal in self.timeline else 1
+        self.goal_num_intervals = len(self.timeline[goal]) if goal in self.timeline else 1
         # maintain a dictionary of discovered states
         # key is the combination of cfg and i; value is the state object
-        self.discoveredStates = dict()
-        self.savePath = save_path
+        self.discovered_states = dict()
+        self.save_path = save_path
         self.vertex_wait_cost = vertex_wait_cost
 
     def intervals(self, loc):
@@ -51,22 +51,23 @@ class Planner:
                 end_t = self.state_interval(s)[1]
                 i = 0
                 for intvl in self.intervals(cfg):
-                    if intvl[0] <= end_t:
+                    start_t = intvl[0]
+                    if start_t <= end_t:
                         i += 1
                         continue
                     # ignore all intervals after it if the current interval's wait cost is Inf
                     try:
-                        if self.wait_cost[cfg][tuple(intvl)] == Inf:
+                        if self.wait_cost[cfg][start_t, start_t] == Inf:
                             break
                     except KeyError:
                         pass
-                    if (cfg, i) in self.discoveredStates:
+                    if (cfg, i) in self.discovered_states:
                         # retrieve the neighbour state object if it was discovered before
-                        nbrState = self.discoveredStates[cfg, i]
+                        nbrState = self.discovered_states[cfg, i]
                         nbrState.tempT = intvl[0]
                     else:
                         nbrState = State(loc=cfg, i=i, tempT=intvl[0], goal=self.goal)
-                        self.discoveredStates[cfg, i] = nbrState
+                        self.discovered_states[cfg, i] = nbrState
                     successors.append(nbrState)
                     i += 1
             else:
@@ -86,13 +87,13 @@ class Planner:
                     except KeyError:
                         pass
                     arrivalTime = self.earliestArrival(start_t, intvl)
-                    if (cfg, i) in self.discoveredStates:
+                    if (cfg, i) in self.discovered_states:
                         # retrieve the neighbour state object if it was discovered before
-                        nbrState = self.discoveredStates[cfg, i]
+                        nbrState = self.discovered_states[cfg, i]
                         nbrState.tempT = arrivalTime
                     else:
                         nbrState = State(loc=cfg, i=i, tempT=arrivalTime, goal=self.goal)
-                        self.discoveredStates[cfg, i] = nbrState
+                        self.discovered_states[cfg, i] = nbrState
                     successors.append(nbrState)
                     i += 1
         return successors
@@ -102,17 +103,20 @@ class Planner:
         if s.loc == n.loc:
             wait_time = n.tempT - s.t
             for intvl in self.intervals(n.loc)[s.i + 1:n.i]:
-                if tuple(intvl) in self.wait_cost[n.loc]:
-                    wait_time += (intvl[1] - intvl[0] + 1) * self.wait_cost[n.loc][tuple(intvl)]
-            if (n.loc in self.wait_cost) and (self.state_interval(n) in self.wait_cost[n.loc]):
-                wait_time += self.wait_cost[n.loc][self.state_interval(n)]
+                from_t = intvl[0]
+                if (from_t, from_t) in self.wait_cost[n.loc]:
+                    wait_time += (intvl[1] - intvl[0] + 1) * self.wait_cost[n.loc][from_t, from_t]
+            try:
+                from_t = self.state_interval(n)[0]
+                wait_time += self.wait_cost[n.loc][from_t, from_t]
+            except KeyError:
+                pass
             cost += wait_time
         else:
             m_time = 1
-            s_interval = self.state_interval(s)
             transition_start_time = n.tempT - m_time
             try:
-                cost_to_transition = self.wait_cost[s.loc][s_interval] * (transition_start_time - s.t)
+                cost_to_transition = self.wait_cost[s.loc][s.t, s.t] * (transition_start_time - s.t)
             except KeyError:
                 cost_to_transition = transition_start_time - s.t
             transition_cost = 1
@@ -134,17 +138,17 @@ class Planner:
         start.g = 0
         start.f = start.h
         # add new State into discovered state
-        self.discoveredStates[start.loc, start.i] = start
+        self.discovered_states[start.loc, start.i] = start
         # add into priority queue
         pq = PriorityQueue()
         pq.add(start)
         final_state = None
         counter = 0
-        while not pq.isEmpty() and self.goalNumOfIntervals > 0:
+        while not pq.isEmpty() and self.goal_num_intervals > 0:
             s = pq.delMin()
             counter += 1
             if s.loc == self.goal:
-                self.goalNumOfIntervals -= 1
+                self.goal_num_intervals -= 1
                 if final_state is None:
                     final_state = s
                 else:
@@ -174,8 +178,8 @@ class Planner:
             print('\npath not found')
         else:
             path = reconstruct_path(final_state)
-            if self.savePath:
+            if self.save_path:
                 print('\nSaving Path...')
-                drawPath(path, self.map, self.original_wait_cost, self.transition_cost, self.vertex_wait_cost)
+                draw_path(path, self.map, self.original_wait_cost, self.transition_cost, self.vertex_wait_cost)
                 print('Saved')
                 return path
