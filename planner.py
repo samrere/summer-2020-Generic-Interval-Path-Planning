@@ -102,10 +102,19 @@ class Planner:
         cost = 0
         if s.loc == n.loc:
             wait_time = n.tempT - s.t
+            # cost to transition
+            try:
+                end_t=self.state_interval(s)[1]
+                time_diff = end_t - s.t + 1 if self.vertex_wait_cost else end_t - s.t
+                wait_time += time_diff * self.wait_cost[s.loc][s.t, s.t]
+            except KeyError:
+                pass
+            # wait cost of all states between s and n
             for intvl in self.intervals(n.loc)[s.i + 1:n.i]:
                 from_t = intvl[0]
                 if (from_t, from_t) in self.wait_cost[n.loc]:
                     wait_time += (intvl[1] - intvl[0] + 1) * self.wait_cost[n.loc][from_t, from_t]
+            # wait cost at n
             try:
                 from_t = self.state_interval(n)[0]
                 wait_time += self.wait_cost[n.loc][from_t, from_t]
@@ -115,10 +124,11 @@ class Planner:
         else:
             m_time = 1
             transition_start_time = n.tempT - m_time
+            cost_to_transition = transition_start_time - s.t
             try:
-                cost_to_transition = self.wait_cost[s.loc][s.t, s.t] * (transition_start_time - s.t)
+                cost_to_transition += self.wait_cost[s.loc][s.t, s.t] * (transition_start_time - s.t)
             except KeyError:
-                cost_to_transition = transition_start_time - s.t
+                pass
             transition_cost = 1
             try:
                 # relative transition cost i.e. cost above 1
