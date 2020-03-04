@@ -1,3 +1,3 @@
 # GIPP
-General Interval Path Planning
+General Interval Path Planning  
 Please run MAIN.py for examples

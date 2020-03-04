@@ -217,7 +217,8 @@ def draw_path(path, map_, wait_cost, transition_cost, vertex_wait_cost):
         scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=cmap)
 
     for t in range(len(robot_loc)):
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(4.8,4.8))
+
         obj, label = [], []
         # draw color bar
         if min_cost is not None and max_cost is not None:

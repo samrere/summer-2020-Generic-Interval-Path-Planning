@@ -127,8 +127,10 @@ class Planner:
                 pass
             target_vertex_cost = 0
             if self.vertex_wait_cost:
-                if (n.loc in self.wait_cost) and ((n.tempT, n.tempT) in self.wait_cost[n.loc]):
+                try:
                     target_vertex_cost = self.wait_cost[n.loc][n.tempT, n.tempT]
+                except KeyError:
+                    pass
             cost += cost_to_transition + transition_cost + target_vertex_cost
         return cost
 
