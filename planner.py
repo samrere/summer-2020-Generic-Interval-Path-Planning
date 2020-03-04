@@ -3,6 +3,12 @@ from shutil import rmtree
 from adt import *
 from fcn import *
 
+'''
+Author: Yu Hou
+Email: yhou0015@student.monash.edu
+Last edit: 04/03/2020
+'''
+
 
 class Planner:
     def __init__(self, file_name, wait_cost, transition_cost, start: tuple, goal: tuple, save_path, vertex_wait_cost):
@@ -104,7 +110,7 @@ class Planner:
             wait_time = n.tempT - s.t
             # cost to transition
             try:
-                end_t=self.state_interval(s)[1]
+                end_t = self.state_interval(s)[1]
                 time_diff = end_t - s.t + 1 if self.vertex_wait_cost else end_t - s.t
                 wait_time += time_diff * self.wait_cost[s.loc][s.t, s.t]
             except KeyError:

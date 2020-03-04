@@ -10,6 +10,12 @@ from numpy import Inf
 
 from adt import PriorityQueue
 
+'''
+Author: Yu Hou
+Email: yhou0015@student.monash.edu
+Last edit: 04/03/2020
+'''
+
 
 def build_map(file_name):
     with open(file_name) as f:
@@ -217,7 +223,7 @@ def draw_path(path, map_, wait_cost, transition_cost, vertex_wait_cost):
         scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=cmap)
 
     for t in range(len(robot_loc)):
-        fig, ax = plt.subplots(figsize=(4.8,4.8))
+        fig, ax = plt.subplots(figsize=(4.8, 4.8))
 
         obj, label = [], []
         # draw color bar

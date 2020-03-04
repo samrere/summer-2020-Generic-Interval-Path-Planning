@@ -2,6 +2,16 @@ from math import sqrt
 
 from numpy import Inf
 
+'''
+Abstract Data Type: State and Priority queue implemented using min heap
+Please be noted that the delMin method in priority queue is a bit different,
+which only delete different element.
+
+Author: Yu Hou
+Email: yhou0015@student.monash.edu
+Last edit: 04/03/2020
+'''
+
 
 class State:
     def __init__(self, loc, i, goal, t=None, tempT=None):

@@ -12,7 +12,8 @@ Uncomment "p.Astar()" in each section to find solution.
 the optimal path is saved to "path" folder
 
 Author: Yu Hou
-Last edit: 27/02/2020
+Email: yhou0015@student.monash.edu
+Last edit: 04/03/2020
 '''
 
 '''
