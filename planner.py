@@ -190,7 +190,7 @@ class Planner:
         print('Calculation Complete.\n')
         rmtree('path', ignore_errors=True)  # delete directory if it already exists
         print('Summary:')
-        print('poped states:', counter)
+        print('popped states:', counter)
         print('priority queue is empty:', pq.isEmpty())
         if final_state is None:
             print('\npath not found')
@@ -200,4 +200,4 @@ class Planner:
                 print('\nSaving Path...')
                 draw_path(path, self.map, self.original_wait_cost, self.transition_cost, self.vertex_wait_cost)
                 print('Saved')
-                return path
+            return path
