@@ -1,5 +1,6 @@
-# GIPP
+## GIPP
 Generic Interval Path Planning  
+
 ## Introduction
 This work is based on the SIPP (Safe Interval Path Planning) method, in which each
 location on the map is split into a sequence of safe/collision intervals along the timeline.  
